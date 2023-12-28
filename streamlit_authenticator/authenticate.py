@@ -188,11 +188,11 @@ class Authenticate:
                     login_form = st.sidebar.form('Login')
 
                 login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
+                self.username = login_form.text_input('ユーザーID').lower()
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
+                self.password = login_form.text_input('パスワード', type='password')
 
-                if login_form.form_submit_button('Login'):
+                if login_form.form_submit_button('ログイン'):
                     self._check_credentials()
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
@@ -303,11 +303,11 @@ class Authenticate:
             False: any user can register.
         """
         if not self.validator.validate_username(username):
-            raise RegisterError('Username is not valid')
+            raise RegisterError('ユーザーIDが正しくありません')
         if not self.validator.validate_name(name):
-            raise RegisterError('Name is not valid')
+            raise RegisterError('お名前が正しくありません')
         if not self.validator.validate_email(email):
-            raise RegisterError('Email is not valid')
+            raise RegisterError('Eメールアドレスが正しくありません')
 
         self.credentials['usernames'][username] = {'name': name, 
             'password': Hasher([password]).generate()[0], 'email': email}
@@ -343,13 +343,13 @@ class Authenticate:
             register_user_form = st.sidebar.form('Register user')
 
         register_user_form.subheader(form_name)
-        new_email = register_user_form.text_input('Email')
-        new_username = register_user_form.text_input('Username').lower()
-        new_name = register_user_form.text_input('Name')
-        new_password = register_user_form.text_input('Password', type='password')
-        new_password_repeat = register_user_form.text_input('Repeat password', type='password')
+        new_email = register_user_form.text_input('Eメールアドレス')
+        new_username = register_user_form.text_input('ユーザーID').lower()
+        new_name = register_user_form.text_input('お名前')
+        new_password = register_user_form.text_input('パスワード', type='password')
+        new_password_repeat = register_user_form.text_input('パスワード（確認）', type='password')
 
-        if register_user_form.form_submit_button('Register'):
+        if register_user_form.form_submit_button('参加登録'):
             if len(new_email) and len(new_username) and len(new_name) and len(new_password) > 0:
                 if new_username not in self.credentials['usernames']:
                     if new_password == new_password_repeat:
@@ -363,11 +363,11 @@ class Authenticate:
                             self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                             return True
                     else:
-                        raise RegisterError('Passwords do not match')
+                        raise RegisterError('パスワードが一致しません')
                 else:
-                    raise RegisterError('Username already taken')
+                    raise RegisterError('そのユーザーIDは使用されています')
             else:
-                raise RegisterError('Please enter an email, username, name, and password')
+                raise RegisterError('Eメール、ユーザーID, お名前、パスワードを、すべて入力ください')
 
     def _set_random_password(self, username: str) -> str:
         """
@@ -422,7 +422,7 @@ class Authenticate:
                 else:
                     return False, None, None
             else:
-                raise ForgotError('Username not provided')
+                raise ForgotError('ユーザーIDを入力してください')
         return None, None, None
 
     def _get_username(self, key: str, value: str) -> str:
@@ -476,7 +476,7 @@ class Authenticate:
             if len(email) > 0:
                 return self._get_username('email', email), email
             else:
-                raise ForgotError('Email not provided')
+                raise ForgotError('Eメールアドレスを入力してください')
         return None, email
 
     def _update_entry(self, username: str, key: str, value: str):
@@ -535,6 +535,6 @@ class Authenticate:
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                     return True
                 else:
-                    raise UpdateError('New and current values are the same')
+                    raise UpdateError('新しいパスワードは古いパスワードと別なものにしてください')
             if len(new_value) == 0:
-                raise UpdateError('New value not provided')
+                raise UpdateError('新しいパスワードを入力してください')
