@@ -367,7 +367,7 @@ class Authenticate:
                 else:
                     raise RegisterError('そのユーザーIDは使用されています')
             else:
-                raise RegisterError('Eメール、ユーザーID, お名前、パスワードを、すべて入力ください')
+                raise RegisterError('Eメール、ユーザーID、お名前、パスワード、すべてご入力ください')
 
     def _set_random_password(self, username: str) -> str:
         """
